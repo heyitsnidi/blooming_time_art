@@ -1,27 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blooming Time Art</title>
+let flowers = [];
 
-  <!-- Load p5.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.dom.min.js"></script>
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  angleMode(DEGREES);
 
-  <!-- Link to your sketch -->
-  <script src="sketch.js" defer></script>
+  // create 40 starting blooms along a time-path
+  for (let i = 0; i < 40; i++) {
+    flowers.push(new Flower((i / 40) * width, height / 2));
+  }
+}
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #000;
+function draw() {
+  background(247, 243, 255); // soft pastel
+
+  // Draw all flowers
+  for (let fl of flowers) {
+    fl.update();
+    fl.display();
+  }
+
+  // Add a new flower following time progression
+  if (frameCount % 60 === 0) { 
+    flowers.push(new Flower(random(width), random(height)));
+  }
+}
+
+// Flower class
+class Flower {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = 1;         // start small
+    this.maxSize = random(20, 60);
+    this.growthSpeed = random(0.05, 0.2);
+    this.petals = floor(random(5, 10));
+    this.color = color(
+      random(180, 255),
+      random(140, 200),
+      random(200, 255),
+      200
+    );
+  }
+
+  update() {
+    if (this.size < this.maxSize) {
+      this.size += this.growthSpeed;
     }
-  </style>
-</head>
+  }
 
-<body>
-</body>
-</html>
+  display() {
+    push();
+    translate(this.x, this.y);
+    noStroke();
+    fill(this.color);
+
+    for (let i = 0; i < this.petals; i++) {
+      ellipse(0, this.size, this.size * 0.6, this.size * 1.8);
+      rotate(360 / this.petals);
+    }
+
+    // center
+    fill(255, 240, 200);
+    ellipse(0, 0, this.size * 0.8);
+    pop();
+  }
+}
